@@ -8,7 +8,6 @@ interface ResizeHandleProps {
 }
 
 export const ResizeHandle: React.FC<ResizeHandleProps> = ({
-  width,
   onWidthChange,
   minWidth = 200,
   maxWidth = 600,
@@ -46,17 +45,9 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
   return (
     <div
       onMouseDown={handleMouseDown}
-      style={{
-        position: 'absolute',
-        left: 0,
-        top: 0,
-        bottom: 0,
-        width: '4px',
-        cursor: 'col-resize',
-        backgroundColor: isDragging ? 'var(--accent-color)' : 'transparent',
-        transition: 'background-color 150ms',
-        zIndex: 10,
-      }}
+      className={`absolute left-0 top-0 bottom-0 w-1 cursor-col-resize transition-colors z-10 ${
+        isDragging ? 'bg-[var(--accent-color)]' : 'bg-transparent'
+      }`}
     />
   )
 }

@@ -14,60 +14,30 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({ path, onNavigate }) => {
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.5rem',
-      padding: '1rem 1.5rem',
-      backgroundColor: '#1a1a2e',
-      borderBottom: '1px solid rgba(0, 217, 255, 0.2)',
-    }}>
-      <span style={{ color: '#a0a0a0', fontSize: '0.875rem' }}>📁</span>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexWrap: 'wrap' }}>
+    <div className="flex items-center gap-2 px-6 py-4 bg-[#1a1a2e] border-b border-[rgba(0,217,255,0.2)]">
+      <span className="text-[#a0a0a0] text-sm">📁</span>
+      <div className="flex items-center gap-1 flex-wrap">
         {parts.length === 0 ? (
-          <span style={{ color: '#00d9ff', fontFamily: 'monospace', fontSize: '0.875rem' }}>/</span>
+          <span className="text-[#00d9ff] font-mono text-sm">/</span>
         ) : (
           <>
             <button
               onClick={() => onNavigate('/')}
-              className="breadcrumb-item"
-              style={{
-                color: '#00d9ff',
-                backgroundColor: '#0f0f1e',
-                border: '1px solid rgba(0, 217, 255, 0.3)',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '0.25rem',
-                cursor: 'pointer',
-                fontFamily: 'monospace',
-                fontSize: '0.875rem',
-              }}
+              className="breadcrumb-item text-[#00d9ff] bg-[#0f0f1e] border border-[rgba(0,217,255,0.3)] px-2 py-1 rounded-sm cursor-pointer font-mono text-sm hover:bg-[#1a1a2e] transition-colors"
             >
               /
             </button>
             {parts.map((part, index) => (
-              <React.Fragment key={index}>
-                <span style={{ color: '#a0a0a0' }}>/</span>
+              <div key={index}>
+                <span className="text-[#a0a0a0]">/</span>
                 <button
                   onClick={() => handleClick(index)}
-                  className="breadcrumb-item"
-                  style={{
-                    color: '#00d9ff',
-                    backgroundColor: '#0f0f1e',
-                    border: '1px solid rgba(0, 217, 255, 0.3)',
-                    padding: '0.25rem 0.5rem',
-                    borderRadius: '0.25rem',
-                    cursor: 'pointer',
-                    fontFamily: 'monospace',
-                    fontSize: '0.875rem',
-                    maxWidth: '150px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
+                  className="breadcrumb-item text-[#00d9ff] bg-[#0f0f1e] border border-[rgba(0,217,255,0.3)] px-2 py-1 rounded-sm cursor-pointer font-mono text-sm hover:bg-[#1a1a2e] transition-colors max-w-[150px] overflow-hidden text-ellipsis"
                   title={part}
                 >
                   {part}
                 </button>
-              </React.Fragment>
+              </div>
             ))}
           </>
         )}

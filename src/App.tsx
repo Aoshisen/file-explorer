@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { invoke as invoke_cmd } from '@tauri-apps/api/core'
 import { Sunburst } from './components/Sunburst'
 import { Breadcrumb } from './components/Breadcrumb'
 import { ResizeHandle } from './components/ResizeHandle'
+import "./index.css";
 
 
 interface FileNode {
@@ -80,57 +81,19 @@ function App() {
   }
 
   return (
-    <div style={{
-      width: '100vw',
-      height: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      backgroundColor: 'var(--bg-primary)',
-      overflow: 'hidden',
-      colorScheme: 'light dark',
-      boxSizing: 'border-box',
-    }}>
+    <div className="w-screen h-screen flex flex-col bg-[var(--bg-primary)] overflow-hidden" style={{ colorScheme: 'light dark' }}>
       {/* Breadcrumb */}
       <Breadcrumb path={currentPath} onNavigate={handleNavigate} />
 
       {/* Main Content - Left/Right Layout */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        overflow: 'hidden',
-        gap: 0,
-        background: 'var(--bg-primary)',
-      }}>
+      <div className="flex-1 flex overflow-hidden gap-0 bg-[var(--bg-primary)]">
         {/* Left: Sunburst - takes all available space */}
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          minWidth: 0,
-        }}>
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
           {loading && (
-            <div style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{
-                  display: 'inline-block',
-                  width: '3rem',
-                  height: '3rem',
-                  border: '4px solid var(--spinner-bg)',
-                  borderTop: '4px solid var(--accent-color)',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                }}></div>
-                <p style={{
-                  color: 'var(--text-secondary)',
-                  marginTop: '1rem',
-                  fontFamily: 'monospace',
-                }}>
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <div className="inline-block w-12 h-12 border-4 border-[var(--spinner-bg)] border-t-[var(--accent-color)] rounded-full animate-spin"></div>
+                <p className="text-[var(--text-secondary)] mt-4 font-mono text-sm">
                   Scanning directory...
                 </p>
               </div>
@@ -138,42 +101,14 @@ function App() {
           )}
 
           {error && (
-            <div style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              <div style={{
-                backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--error-color)',
-                borderRadius: '0.5rem',
-                padding: '1.5rem',
-                maxWidth: '28rem',
-              }}>
-                <p style={{
-                  color: 'var(--error-color)',
-                  fontFamily: 'monospace',
-                  fontSize: '0.875rem',
-                }}>
+            <div className="flex-1 flex items-center justify-center">
+              <div className="bg-[var(--bg-secondary)] border border-[var(--error-color)] rounded-lg p-6 max-w-sm">
+                <p className="text-[var(--error-color)] font-mono text-sm">
                   {error}
                 </p>
                 <button
                   onClick={() => loadDirectory(currentPath)}
-                  style={{
-                    marginTop: '1rem',
-                    padding: '0.5rem 1rem',
-                    backgroundColor: 'var(--error-color)',
-                    color: 'var(--bg-primary)',
-                    borderRadius: '0.375rem',
-                    fontFamily: 'monospace',
-                    fontSize: '0.875rem',
-                    border: 'none',
-                    cursor: 'pointer',
-                    transition: 'background-color 200ms',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--error-color-hover)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--error-color)')}
+                  className="mt-4 px-4 py-2 bg-[var(--error-color)] text-[var(--bg-primary)] rounded transition-colors hover:bg-[var(--error-color-hover)] font-mono text-sm"
                 >
                   Retry
                 </button>
@@ -182,7 +117,7 @@ function App() {
           )}
 
           {data && !loading && (
-            <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+            <div className="flex-1 overflow-hidden relative">
               <Sunburst
                 data={data}
                 onNodeClick={handleNodeClick}
@@ -195,78 +130,37 @@ function App() {
 
         {/* Right: File List */}
         {data && !loading && (
-          <div style={{
-            width: `${panelWidth}px`,
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: 'var(--bg-secondary)',
-            borderLeft: '1px solid var(--border-color)',
-            flexShrink: 0,
-            position: 'relative',
-          }}>
+          <div style={{ width: `${panelWidth}px` }} className="flex flex-col bg-[var(--bg-secondary)] border-l border-[var(--border-color)] flex-shrink-0 relative">
             <ResizeHandle width={panelWidth} onWidthChange={setPanelWidth} />
             {/* List Items */}
-            <div style={{
-              flex: 1,
-              overflow: 'auto',
-              padding: '0.25rem',
-            }}>
+            <div className="flex-1 overflow-auto p-1">
               {data.children && data.children.map((child, index) => (
                 <div
                   key={index}
                   onClick={() => child.is_dir && handleNodeClick(child.path)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '0.75rem',
-                    padding: '0.75rem 1rem',
-                    marginBottom: '0.25rem',
-                    backgroundColor: hoveredNode?.path === child.path ? 'var(--hover-bg)' : 'transparent',
-                    borderRadius: '0.375rem',
-                    cursor: child.is_dir ? 'pointer' : 'default',
-                    transition: 'background-color 150ms',
-                    borderLeft: hoveredNode?.path === child.path ? '2px solid var(--accent-color)' : '2px solid transparent',
-                  }}
+                  className={`flex items-center justify-between gap-3 px-4 py-3 mb-1 rounded transition-colors cursor-${child.is_dir ? 'pointer' : 'default'} ${
+                    hoveredNode?.path === child.path
+                      ? 'bg-[var(--hover-bg)] border-l-2 border-[var(--accent-color)]'
+                      : 'border-l-2 border-transparent'
+                  }`}
                   onMouseEnter={() => setHoveredNode(child)}
                   onMouseLeave={() => setHoveredNode(null)}
                 >
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    flex: 1,
-                    minWidth: 0,
-                  }}>
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
                     {/* Color indicator */}
-                    <div style={{
-                      width: '12px',
-                      height: '12px',
-                      backgroundColor: getColorForIndex(index),
-                      borderRadius: '2px',
-                      flexShrink: 0,
-                    }} />
+                    <div
+                      style={{ backgroundColor: getColorForIndex(index) }}
+                      className="w-3 h-3 rounded-sm flex-shrink-0"
+                    />
 
                     {/* Name */}
-                    <div style={{
-                      fontSize: '0.875rem',
-                      color: 'var(--text-primary)',
-                      fontFamily: 'monospace',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}>
+                    <div className="text-sm text-[var(--text-primary)] font-mono overflow-hidden text-ellipsis whitespace-nowrap">
                       {child.is_dir ? `/${child.name}` : child.name}
                     </div>
                   </div>
 
                   {/* Size */}
-                  <div style={{
-                    fontSize: '0.75rem',
-                    color: 'var(--text-secondary)',
-                    fontFamily: 'monospace',
-                    flexShrink: 0,
-                  }}>
+                  <div className="text-xs text-[var(--text-secondary)] font-mono flex-shrink-0">
                     {formatSize(child.size)}
                   </div>
                 </div>
@@ -275,63 +169,6 @@ function App() {
           </div>
         )}
       </div>
-
-      <style>{`
-        * {
-          box-sizing: border-box;
-        }
-
-        html, body {
-          margin: 0;
-          padding: 0;
-          width: 100%;
-          height: 100%;
-          overflow: hidden;
-        }
-
-        :root {
-          color-scheme: light dark;
-        }
-
-        @media (prefers-color-scheme: dark) {
-          :root {
-            --bg-primary: #0f0f1e;
-            --bg-secondary: #1a1a2e;
-            --text-primary: #e0e0e0;
-            --text-secondary: #a0a0a0;
-            --accent-color: #00d9ff;
-            --accent-color-light: rgba(0, 217, 255, 0.2);
-            --accent-color-lighter: rgba(0, 217, 255, 0.1);
-            --border-color: rgba(0, 217, 255, 0.2);
-            --error-color: #ff006e;
-            --error-color-hover: rgba(255, 0, 110, 0.8);
-            --spinner-bg: rgba(0, 217, 255, 0.3);
-            --hover-bg: rgba(0, 217, 255, 0.1);
-          }
-        }
-
-        @media (prefers-color-scheme: light) {
-          :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f5f5f5;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666666;
-            --accent-color: #0066cc;
-            --accent-color-light: rgba(0, 102, 204, 0.2);
-            --accent-color-lighter: rgba(0, 102, 204, 0.1);
-            --border-color: rgba(0, 102, 204, 0.2);
-            --error-color: #cc0033;
-            --error-color-hover: rgba(204, 0, 51, 0.8);
-            --spinner-bg: rgba(0, 102, 204, 0.3);
-            --hover-bg: rgba(0, 102, 204, 0.1);
-          }
-        }
-
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   )
 }

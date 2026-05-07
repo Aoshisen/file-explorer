@@ -91,7 +91,7 @@ export const Sunburst: React.FC<SunburstProps> = ({ data, onNodeClick, onHover, 
       .innerRadius((d) => d.y0 || 0)
       .outerRadius((d) => d.y1 || 0)
 
-    const paths = g
+    g
       .selectAll('path')
       .data(root.descendants().filter((d) => d.depth > 0))
       .join('path')
@@ -132,12 +132,7 @@ export const Sunburst: React.FC<SunburstProps> = ({ data, onNodeClick, onHover, 
   return (
     <svg
       ref={svgRef}
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'block',
-        background: 'transparent',
-      }}
+      className="w-full h-full block bg-transparent"
     />
   )
 }

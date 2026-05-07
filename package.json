@@ -10,6 +10,7 @@
     "tauri:build": "tauri build"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.2.4",
     "@tauri-apps/api": "^2.11.0",
     "d3": "^7.9.0",
     "react": "^19.2.6",
