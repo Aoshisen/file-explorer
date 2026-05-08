@@ -1,5 +1,5 @@
 import React from 'react'
-
+import { Flex } from './Flex'
 interface BreadcrumbProps {
   path: string
   onNavigate: (path: string) => void
@@ -15,7 +15,7 @@ const BreadcrumbItem: React.FC<BreadcrumbItemProps> = ({ label, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="breadcrumb-item text-[#00d9ff] bg-[#0f0f1e] border border-[rgba(0,217,255,0.3)] px-2 py-1 rounded-sm cursor-pointer font-mono text-sm hover:bg-[#1a1a2e] transition-colors max-w-[150px] overflow-hidden text-ellipsis"
+      className="text-[#00d9ff] bg-[#0f0f1e] border border-[rgba(0,217,255,0.3)] px-2 py-1 rounded-sm cursor-pointer font-mono text-sm hover:bg-[#1a1a2e] transition-colors max-w-[150px] truncate"
       title={label}
     >
       {label}
@@ -44,21 +44,19 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({ path, onNavigate }) => {
       label: part,
     }
   })
+
   const pathItemWithRoot = [{ key: 'root', path: '/', label: '/' }, ...pathItems]
-
-
   return (
-    <div className="flex items-center gap-2 px-6 py-4 bg-[#1a1a2e] border-b border-[rgba(0,217,255,0.2)]">
-      <div className="flex items-center gap-1 flex-wrap">
+    <div className="p-2 bg-[#1a1a2e] border-b border-[rgba(0,217,255,0.2)]">
+      <Flex className='gap-1 justify-center'>
         {pathItemWithRoot.map((item) => (
-          <React.Fragment key={item.key}>
-            <BreadcrumbItem
-              label={item.label}
-              onClick={() => onNavigate(item.path)}
-            />
-          </React.Fragment>
+          <BreadcrumbItem
+            label={item.label}
+            onClick={() => onNavigate(item.path)}
+            key={item.key}
+          />
         ))}
-      </div>
+      </Flex>
     </div>
   )
 }

@@ -18,7 +18,7 @@ interface D3Node extends d3.HierarchyRectangularNode<FileNode> {
 
 interface SunburstProps {
   data: FileNode
-  onNodeClick: (path: string) => void
+  onNodeClick: (path: FileNode) => void
   onHover: (node: FileNode | null) => void
   hoveredNode?: FileNode | null
 }
@@ -108,9 +108,7 @@ export const Sunburst: React.FC<SunburstProps> = ({ data, onNodeClick, onHover, 
       })
       .on('click', (event, d) => {
         event.stopPropagation()
-        if (d.data.is_dir) {
-          onNodeClick(d.data.path)
-        }
+        onNodeClick(d.data)
       })
       .on('mouseenter', (event, d) => {
         setHoveredNode(d.data)

@@ -7,6 +7,7 @@ import { ListItem } from './components/ListItem'
 import { getColorForIndex, formatSize } from './utils/format'
 import { useFileExplorerStore } from './store/fileExplorer'
 import "./index.css";
+import { FileNode } from './types/FileNode'
 
 function App() {
   const {
@@ -24,14 +25,17 @@ function App() {
     loadDirectory(home)
   }, [loadDirectory])
 
-  const handleNodeClick = (path: string) => {
-    loadDirectory(path)
+  const handleNodeClick = (item: FileNode) => {
+    if (!item.is_dir) {
+      return;
+    }
+    loadDirectory(item.path)
   }
 
   const handleNavigate = (path: string) => {
     loadDirectory(path)
   }
-
+  const ok = data && !loading && !error;
   return (
     <Layout>
       <Breadcrumb path={currentPath} onNavigate={handleNavigate} />
@@ -65,7 +69,7 @@ function App() {
             </div>
           )}
 
-          {data && !loading && (
+          {ok && (
             <div className="flex-1 overflow-hidden relative">
               <Sunburst
                 data={data}
@@ -77,18 +81,19 @@ function App() {
           )}
         </Flex>
 
-        {data && !loading && (
+        {ok && (
           <Flex direction="col" className="bg-[var(--bg-secondary)] border-l border-[var(--border-color)] flex-shrink-0 relative min-w-[400px]">
             <div className="flex-1 overflow-auto p-1">
-              {data.children && data.children.map((child, index) => (
+              {data.children?.map((child, index) => (
                 <ListItem
                   key={index}
                   item={child}
                   isHovered={hoveredNode?.path === child.path}
                   onHover={setHoveredNode}
-                  onClick={handleNodeClick}
+                  onClick={() => handleNodeClick(child)}
                   background_color={getColorForIndex(index)}
                   size={formatSize(child.size)}
+                  isDir={child.is_dir}
                 />
               ))}
             </div>

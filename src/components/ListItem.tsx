@@ -5,9 +5,10 @@ interface ListItemProps {
   item: FileNode
   isHovered: boolean
   onHover: (node: FileNode | null) => void
-  onClick: (path: string) => void
+  onClick: (path: FileNode) => void
   background_color: string
   size: string
+  isDir: boolean
 }
 
 export const ListItem: React.FC<ListItemProps> = ({
@@ -16,12 +17,13 @@ export const ListItem: React.FC<ListItemProps> = ({
   onHover,
   onClick,
   background_color,
-  size
+  size,
+  isDir
 }) => {
   return (
     <div
-      onClick={() => item.is_dir && onClick(item.path)}
-      className={`flex items-center justify-between gap-3 px-4 py-3 mb-1 rounded transition-colors cursor-${item.is_dir ? 'pointer' : 'default'} ${isHovered
+      onClick={onClick}
+      className={`flex items-center justify-between gap-3 px-4 py-3 mb-1 rounded transition-colors cursor-${isDir ? 'pointer' : 'default'} ${isHovered
         ? 'bg-[var(--hover-bg)] border-l-2 border-[var(--accent-color)]'
         : 'border-l-2 border-transparent'
         }`}
@@ -37,7 +39,7 @@ export const ListItem: React.FC<ListItemProps> = ({
 
         {/* Name */}
         <div className="text-sm text-[var(--text-primary)] font-mono overflow-hidden text-ellipsis whitespace-nowrap">
-          {item.is_dir ? `/${item.name}` : item.name}
+          {isDir ? `/${item.name}` : item.name}
         </div>
       </div>
 
