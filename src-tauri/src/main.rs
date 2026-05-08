@@ -1,9 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-mod lib;
-
-use lib::{scan_directory, FileNode};
+use file_explorer::{scan_directory, FileNode};
 
 #[tauri::command]
 fn hello_world() -> String {
