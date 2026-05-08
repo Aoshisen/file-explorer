@@ -19,14 +19,14 @@ interface D3Node extends d3.HierarchyRectangularNode<FileNode> {
 
 interface SunburstProps {
   data: FileNode
-  onNodeClick: (path: FileNode) => void
-  onHover: (node: FileNode | null) => void
-  hoveredNode?: FileNode | null
+  onNodeClick: (node: FileNode) => void
+  onHover?: (node: FileNode | null) => void
 }
 
-export const Sunburst: React.FC<SunburstProps> = ({ data, onNodeClick, onHover, hoveredNode }) => {
+export const Sunburst: React.FC<SunburstProps> = ({ data, onNodeClick, onHover }) => {
   const svgRef = useRef<SVGSVGElement>(null)
-  const [_, setHoveredNode] = useState<FileNode | null>(null)
+  const NORMAL_OPACITY = 0.3;
+  const SELECTED_OPACITY = 0.8;
 
   useEffect(() => {
     if (!svgRef.current || !data) return
@@ -74,21 +74,23 @@ export const Sunburst: React.FC<SunburstProps> = ({ data, onNodeClick, onHover, 
       .attr('fill', (d) => d.data.color)
       .attr('stroke', '#0f0f1e')
       .attr('stroke-width', 1)
-      .attr('opacity', (d) => d.data.path === hoveredNode?.path ? 1 : 0.4)
+      .attr("opacity", NORMAL_OPACITY)
       .on('click', (event, d) => {
         event.stopPropagation()
         onNodeClick(d.data)
       })
-      .on('mouseenter', (_, d) => {
-        setHoveredNode(d.data)
-        onHover(d.data)
-      })
-      .on('mouseleave', () => {
-        setHoveredNode(null)
-        onHover(null)
-      })
+      .on("mouseover", function (_, d) {
+        onHover?.(d.data)
+        d3.select(this)
+          .attr('opacity', SELECTED_OPACITY)
 
-  }, [data, onNodeClick, onHover, hoveredNode])
+      })
+      .on("mouseout", function () {
+        onHover?.(null)
+        d3.select(this)
+          .attr('opacity', NORMAL_OPACITY)
+      })
+  }, [data, onNodeClick])
 
   return (
     <svg

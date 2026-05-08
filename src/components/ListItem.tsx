@@ -3,32 +3,43 @@ import { FileNode } from '../types/FileNode'
 
 interface ListItemProps {
   item: FileNode
-  isHovered: boolean
-  onHover: (node: FileNode | null) => void
   onClick: () => void
   background_color: string
   size: string
   isDir: boolean
+  onHover?: (node: FileNode | null) => void
 }
 
 export const ListItem: React.FC<ListItemProps> = ({
   item,
-  isHovered,
-  onHover,
   onClick,
   background_color,
   size,
-  isDir
+  isDir,
+  onHover
 }) => {
   return (
     <div
       onClick={onClick}
-      className={`flex items-center justify-between gap-3 px-4 py-3 mb-1 rounded transition-colors cursor-${isDir ? 'pointer' : 'default'} ${isHovered
-        ? 'bg-[var(--hover-bg)] border-l-2 border-[var(--accent-color)]'
-        : 'border-l-2 border-transparent'
-        }`}
-      onMouseEnter={() => onHover(item)}
-      onMouseLeave={() => onHover(null)}
+      className={
+        `flex items-center justify-between gap-3 px-4 py-3 mb-1 rounded transition-colors cursor-${isDir ? 'pointer' : 'default'} 
+         /* 默认状态 */
+        border-l-2 border-transparent
+        /* Hover 状态：Tailwind 自动处理 */
+        hover:bg-[var(--hover-bg)] 
+        hover:border-l-2 
+        hover:border-[var(--accent-color)]
+        }`
+      }
+      onMouseOver={
+        () => {
+          onHover?.(item)
+        }
+      }
+      onMouseLeave={() => {
+        onHover?.(null)
+      }}
+
     >
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {/* Color indicator */}

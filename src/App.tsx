@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { Sunburst } from './components/Sunburst'
 import { Breadcrumb } from './components/Breadcrumb'
 import { Layout } from './components/Layout'
@@ -15,9 +15,7 @@ function App() {
     data,
     loading,
     error,
-    hoveredNode,
     loadDirectory,
-    setHoveredNode,
   } = useFileExplorerStore()
 
   useEffect(() => {
@@ -25,17 +23,21 @@ function App() {
     loadDirectory(home)
   }, [loadDirectory])
 
-  const handleNodeClick = (item: FileNode) => {
-    if (!item.is_dir) {
-      return;
-    }
-    loadDirectory(item.path)
-  }
 
   const handleNavigate = (path: string) => {
     loadDirectory(path)
   }
+
   const ok = data && !loading && !error;
+
+  const handleNodeClick = useCallback((item: FileNode) => {
+    if (!item.is_dir) {
+      return;
+    }
+    loadDirectory(item.path)
+  }, [loadDirectory])
+
+
   return (
     <Layout>
       <Breadcrumb path={currentPath} onNavigate={handleNavigate} />
@@ -74,8 +76,6 @@ function App() {
               <Sunburst
                 data={data}
                 onNodeClick={handleNodeClick}
-                onHover={setHoveredNode}
-                hoveredNode={hoveredNode}
               />
             </div>
           )}
@@ -88,8 +88,6 @@ function App() {
                 <ListItem
                   key={index}
                   item={child}
-                  isHovered={hoveredNode?.path === child.path}
-                  onHover={setHoveredNode}
                   onClick={() => handleNodeClick(child)}
                   background_color={child.color || 'rgba(128, 128, 128, 0.7)'}
                   size={formatSize(child.size)}
