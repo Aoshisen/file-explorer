@@ -72,7 +72,7 @@ function App() {
           )}
 
           {ok && (
-            <div className="flex-1 overflow-hidden relative">
+            <div className="flex-1 overflow-hidden relative w-full h-full">
               <Sunburst
                 data={data}
                 onNodeClick={handleNodeClick}
