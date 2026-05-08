@@ -1,39 +1,28 @@
-import { useState, useEffect } from 'react'
-import { invoke as invoke_cmd } from '@tauri-apps/api/core'
+import { useEffect } from 'react'
 import { Sunburst } from './components/Sunburst'
 import { Breadcrumb } from './components/Breadcrumb'
 import { Layout } from './components/Layout'
 import { Flex } from './components/Flex'
 import { ListItem } from './components/ListItem'
-import { FileNode } from './types/FileNode'
 import { getColorForIndex, formatSize } from './utils/format'
+import { useFileExplorerStore } from './store/fileExplorer'
 import "./index.css";
 
 function App() {
-  const [currentPath, setCurrentPath] = useState<string>('/')
-  const [data, setData] = useState<FileNode | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [hoveredNode, setHoveredNode] = useState<FileNode | null>(null)
+  const {
+    currentPath,
+    data,
+    loading,
+    error,
+    hoveredNode,
+    loadDirectory,
+    setHoveredNode,
+  } = useFileExplorerStore()
 
   useEffect(() => {
-    const initPath = async () => {
-      const home = "/Users/aoshisen/Documents/Code/file-explorer";
-      console.log('Home directory:', home)
-      setCurrentPath(home)
-      loadDirectory(home)
-    }
-    initPath()
-  }, [])
-
-  const loadDirectory = async (path: string) => {
-    setLoading(true)
-    setError(null)
-    const result = await invoke_cmd<FileNode>('scan_dir', { path })
-    setData(result)
-    setCurrentPath(path)
-    setLoading(false)
-  }
+    const home = "/Users/aoshisen/Documents/Code/file-explorer"
+    loadDirectory(home)
+  }, [loadDirectory])
 
   const handleNodeClick = (path: string) => {
     loadDirectory(path)
@@ -41,10 +30,6 @@ function App() {
 
   const handleNavigate = (path: string) => {
     loadDirectory(path)
-  }
-
-  const handleHover = (node: FileNode | null) => {
-    setHoveredNode(node)
   }
 
   return (
@@ -85,7 +70,7 @@ function App() {
               <Sunburst
                 data={data}
                 onNodeClick={handleNodeClick}
-                onHover={handleHover}
+                onHover={setHoveredNode}
                 hoveredNode={hoveredNode}
               />
             </div>
@@ -99,12 +84,11 @@ function App() {
                 <ListItem
                   key={index}
                   item={child}
-                  index={index}
                   isHovered={hoveredNode?.path === child.path}
                   onHover={setHoveredNode}
                   onClick={handleNodeClick}
-                  getColorForIndex={getColorForIndex}
-                  formatSize={formatSize}
+                  background_color={getColorForIndex(index)}
+                  size={formatSize(child.size)}
                 />
               ))}
             </div>
