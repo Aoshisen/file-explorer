@@ -3,5 +3,6 @@ export interface FileNode {
   path: string
   size: number
   is_dir: boolean
+  color: string
   children?: FileNode[]
 }

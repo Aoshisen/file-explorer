@@ -1,6 +1,7 @@
 import { create } from 'zustand'
-import { invoke as invoke_cmd } from '@tauri-apps/api/core'
+import { invoke } from '@tauri-apps/api/core'
 import { FileNode } from '../types/FileNode'
+import { assignColorsToTree } from '../utils/colorAssigner'
 
 interface FileExplorerStore {
   currentPath: string
@@ -33,11 +34,7 @@ export const useFileExplorerStore = create<FileExplorerStore>((set) => ({
 
   loadDirectory: async (path) => {
     set({ loading: true, error: null })
-    try {
-      const result = await invoke_cmd<FileNode>('scan_dir', { path })
-      set({ data: result, currentPath: path, loading: false })
-    } catch (err) {
-      set({ error: String(err), loading: false })
-    }
+    const result = await invoke<FileNode>('scan_dir', { path })
+    set({ data: assignColorsToTree(result), currentPath: path, loading: false })
   },
 }))

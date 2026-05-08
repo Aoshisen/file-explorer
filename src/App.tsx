@@ -4,7 +4,7 @@ import { Breadcrumb } from './components/Breadcrumb'
 import { Layout } from './components/Layout'
 import { Flex } from './components/Flex'
 import { ListItem } from './components/ListItem'
-import { getColorForIndex, formatSize } from './utils/format'
+import { formatSize } from './utils/format'
 import { useFileExplorerStore } from './store/fileExplorer'
 import "./index.css";
 import { FileNode } from './types/FileNode'
@@ -91,7 +91,7 @@ function App() {
                   isHovered={hoveredNode?.path === child.path}
                   onHover={setHoveredNode}
                   onClick={() => handleNodeClick(child)}
-                  background_color={getColorForIndex(index)}
+                  background_color={child.color || 'rgba(128, 128, 128, 0.7)'}
                   size={formatSize(child.size)}
                   isDir={child.is_dir}
                 />

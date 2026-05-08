@@ -5,7 +5,7 @@ interface ListItemProps {
   item: FileNode
   isHovered: boolean
   onHover: (node: FileNode | null) => void
-  onClick: (path: FileNode) => void
+  onClick: () => void
   background_color: string
   size: string
   isDir: boolean

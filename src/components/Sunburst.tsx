@@ -6,6 +6,7 @@ interface FileNode {
   path: string
   size: number
   is_dir: boolean
+  color: string
   children?: FileNode[]
 }
 
@@ -21,33 +22,6 @@ interface SunburstProps {
   onNodeClick: (path: FileNode) => void
   onHover: (node: FileNode | null) => void
   hoveredNode?: FileNode | null
-}
-
-// 颜色调色板，不带透明度
-const colors = [
-  'rgb(0, 217, 255)',      // 青色
-  'rgb(255, 0, 110)',      // 粉红
-  'rgb(57, 255, 20)',      // 绿色
-  'rgb(255, 215, 0)',      // 金色
-  'rgb(255, 69, 0)',       // 橙红
-  'rgb(0, 206, 209)',      // 深青
-  'rgb(138, 43, 226)',     // 蓝紫
-  'rgb(255, 105, 180)',    // 热粉
-]
-
-const getColor = (depth: number, index: number) => {
-  const baseColor = colors[(depth * 7 + index) % colors.length]
-  // 基于 depth 和 index 生成伪随机透明度 (0.01 - 0.1)
-  const seed = (depth * 7 + index) * 12345
-  const random = ((seed * 9301 + 49297) % 233280) / 233280
-  const alpha = (0.05 + random * 0.3).toFixed(2)
-
-  // 从 rgb(r, g, b) 提取数字，转换为 rgba(r, g, b, alpha)
-  const match = baseColor.match(/\d+/g)
-  if (match && match.length === 3) {
-    return `rgba(${match[0]}, ${match[1]}, ${match[2]}, ${alpha})`
-  }
-  return baseColor
 }
 
 export const Sunburst: React.FC<SunburstProps> = ({ data, onNodeClick, onHover, hoveredNode }) => {
@@ -97,32 +71,21 @@ export const Sunburst: React.FC<SunburstProps> = ({ data, onNodeClick, onHover, 
       .join('path')
       .attr('class', 'sunburst-arc cursor-pointer')
       .attr('d', arc as any)
-      .attr('fill', (d, i) => {
-        return getColor(d.depth, i)
-      })
+      .attr('fill', (d) => d.data.color)
       .attr('stroke', '#0f0f1e')
-      .attr('stroke-width', 2)
-      .attr('opacity', (d) => {
-        if (!hoveredNode) return 1
-        return d.data.path === hoveredNode.path ? 0.5 : 1
-      })
+      .attr('stroke-width', 1)
+      .attr('opacity', (d) => d.data.path === hoveredNode?.path ? 1 : 0.4)
       .on('click', (event, d) => {
         event.stopPropagation()
         onNodeClick(d.data)
       })
-      .on('mouseenter', (event, d) => {
+      .on('mouseenter', (_, d) => {
         setHoveredNode(d.data)
         onHover(d.data)
-        d3.select(event.currentTarget)
-          .attr('filter', 'brightness(1.3)')
-          .attr('stroke-width', 3)
       })
-      .on('mouseleave', (event) => {
+      .on('mouseleave', () => {
         setHoveredNode(null)
         onHover(null)
-        d3.select(event.currentTarget)
-          .attr('filter', 'none')
-          .attr('stroke-width', 2)
       })
 
   }, [data, onNodeClick, onHover, hoveredNode])
