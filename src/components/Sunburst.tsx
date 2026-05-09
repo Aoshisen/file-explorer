@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import * as d3 from 'd3'
 import { FileNode } from '../types/FileNode'
+import { useMount } from 'ahooks'
 
 interface SunburstProps {
   data: FileNode
@@ -9,36 +10,29 @@ interface SunburstProps {
   className?: string
 }
 
-export const Sunburst: React.FC<SunburstProps> = ({ data, onNodeClick, onHover, className }) => {
+type Node = d3.HierarchyRectangularNode<FileNode>
+export const Sunburst: React.FC<SunburstProps> = ({ data, className }) => {
   const svgRef = useRef<SVGSVGElement>(null)
   const VIEW_BOX_SIZE = 400;
-  const radius = VIEW_BOX_SIZE / 2;
+  const RADIUS = VIEW_BOX_SIZE / 2;
 
   const NORMAL_OPACITY = 0.3;
-  const SELECTED_OPACITY = 0.8;
 
-  useEffect(() => {
+  useMount(() => {
     if (!svgRef.current || !data) return
 
     const svg = d3.select(svgRef.current)
     svg.selectAll('*').remove()
 
-    svg
-      .attr('viewBox', `0 0 ${VIEW_BOX_SIZE} ${VIEW_BOX_SIZE}`)
-      .attr('preserveAspectRatio', 'xMidYMid meet') // 保持比例居中，如果想填满可改为 'none' 或 'xMidYMid slice'
+    svg.attr('viewBox', `0 0 ${VIEW_BOX_SIZE} ${VIEW_BOX_SIZE}`)
 
-    const g = svg
-      .append('g')
-      .attr('transform', `translate(${VIEW_BOX_SIZE / 2},${VIEW_BOX_SIZE / 2})`)
+    const g = svg.append('g').attr('transform', `translate(${RADIUS},${RADIUS})`)
 
-    const hierarchy = d3.hierarchy(data)
-      .sum((d) => d.size)
-      .sort((a, b) => (b.value || 0) - (a.value || 0))
+    const hierarchy = d3.hierarchy(data).sum((d) => d.size).sort((a, b) => b.data.size - a.data.size)
 
-    const partition = d3.partition<FileNode>()
-      .size([2 * Math.PI, radius * 0.95])
+    const partition = d3.partition<FileNode>().size([2 * Math.PI, RADIUS * 0.95])
 
-    const root = partition(hierarchy) as any // 简化类型断言
+    const root = partition(hierarchy) as Node;
 
     const arc = d3.arc<any>()
       .startAngle((d) => d.x0 || 0)
@@ -52,28 +46,33 @@ export const Sunburst: React.FC<SunburstProps> = ({ data, onNodeClick, onHover, 
       .join('path')
       .attr('class', 'sunburst-arc cursor-pointer')
       .attr('d', arc)
-      .attr('fill', (d: any) => d.data.color)
+      .attr('fill', (d: Node) => d.data.color)
       .attr('stroke', '#0f0f1e')
       .attr('stroke-width', 1)
       .attr("opacity", NORMAL_OPACITY)
-      .on('click', (event: any, d: any) => {
-        event.stopPropagation()
-        onNodeClick?.(d.data)
-      })
-      .on("mouseover", function (_, d: any) {
-        onHover?.(d.data)
-        d3.select(this)
-          .transition().duration(200)
-          .attr('opacity', SELECTED_OPACITY)
-      })
-      .on("mouseout", function () {
-        onHover?.(null)
-        d3.select(this)
-          .transition().duration(200)
-          .attr('opacity', NORMAL_OPACITY)
-      })
+      .on('click', clicked)
+    function clicked(event: any, d: Node) {
+      if (!d.data.is_dir) {
+        return;
+      }
+      svg.selectAll("*").remove()
+      const newHierarchy = d3.hierarchy(d.data).sum((d) => d.size).sort((a, b) => b.data.size - a.data.size)
+      const newRoot = partition(newHierarchy) as Node
 
-  }, [data, onNodeClick, onHover])
+      const g = svg.append('g').attr('transform', `translate(${RADIUS},${RADIUS})`)
+      g
+        .selectAll('path')
+        .data(newRoot.descendants().filter((d: any) => d.depth > 0))
+        .join('path')
+        .attr('class', 'sunburst-arc cursor-pointer')
+        .attr('d', arc)
+        .attr('fill', (d: Node) => d.data.color)
+        .attr('stroke', '#0f0f1e')
+        .attr('stroke-width', 1)
+        .attr("opacity", NORMAL_OPACITY)
+        .on("click", clicked)
+    }
+  })
 
   return (
     <svg
