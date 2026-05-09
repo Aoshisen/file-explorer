@@ -11,6 +11,7 @@ interface SunburstProps {
 }
 
 type Node = d3.HierarchyRectangularNode<FileNode>
+const data_key = (d: Node) => d.data.path;
 export const Sunburst: React.FC<SunburstProps> = ({ data, className }) => {
   const svgRef = useRef<SVGSVGElement>(null)
   const VIEW_BOX_SIZE = 400;
@@ -42,7 +43,7 @@ export const Sunburst: React.FC<SunburstProps> = ({ data, className }) => {
 
     g
       .selectAll('path')
-      .data(root.descendants().filter((d: any) => d.depth > 0))
+      .data(root.descendants().filter((d: any) => d.depth > 0), data_key)
       .join('path')
       .attr('class', 'sunburst-arc cursor-pointer')
       .attr('d', arc)
@@ -51,26 +52,15 @@ export const Sunburst: React.FC<SunburstProps> = ({ data, className }) => {
       .attr('stroke-width', 1)
       .attr("opacity", NORMAL_OPACITY)
       .on('click', clicked)
+
     function clicked(event: any, d: Node) {
       if (!d.data.is_dir) {
         return;
       }
-      svg.selectAll("*").remove()
       const newHierarchy = d3.hierarchy(d.data).sum((d) => d.size).sort((a, b) => b.data.size - a.data.size)
       const newRoot = partition(newHierarchy) as Node
+      g.selectAll("path").data(newRoot.descendants().filter((d: any) => d.depth > 0), data_key).exit().remove()
 
-      const g = svg.append('g').attr('transform', `translate(${RADIUS},${RADIUS})`)
-      g
-        .selectAll('path')
-        .data(newRoot.descendants().filter((d: any) => d.depth > 0))
-        .join('path')
-        .attr('class', 'sunburst-arc cursor-pointer')
-        .attr('d', arc)
-        .attr('fill', (d: Node) => d.data.color)
-        .attr('stroke', '#0f0f1e')
-        .attr('stroke-width', 1)
-        .attr("opacity", NORMAL_OPACITY)
-        .on("click", clicked)
     }
   })
 
