@@ -6,7 +6,6 @@ import { Flex } from './components/Flex'
 import { ListItem } from './components/ListItem'
 import { formatSize } from './utils/format'
 import { useFileExplorerStore } from './store/fileExplorer'
-import "./index.css";
 import { FileNode } from './types/FileNode'
 
 function App() {

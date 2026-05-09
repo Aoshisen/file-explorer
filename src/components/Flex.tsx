@@ -9,7 +9,7 @@ interface FlexProps {
 export const Flex: React.FC<FlexProps> = ({ children, direction = 'row', className = '' }) => {
   const directionClass = direction === 'col' ? 'flex-col' : 'flex-row'
   return (
-    <div className={`flex ${directionClass} ${className}`}>
+    <div className={`flex items-center justify-center ${directionClass} ${className}`}>
       {children}
     </div>
   )

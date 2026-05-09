@@ -2,11 +2,9 @@ import React, { useEffect, useRef } from 'react'
 import * as d3 from 'd3'
 import { FileNode } from '../types/FileNode'
 
-// ... 接口定义保持不变 ...
-
 interface SunburstProps {
   data: FileNode
-  onNodeClick: (node: FileNode) => void
+  onNodeClick?: (node: FileNode) => void
   onHover?: (node: FileNode | null) => void
   className?: string
 }
@@ -60,7 +58,7 @@ export const Sunburst: React.FC<SunburstProps> = ({ data, onNodeClick, onHover, 
       .attr("opacity", NORMAL_OPACITY)
       .on('click', (event: any, d: any) => {
         event.stopPropagation()
-        onNodeClick(d.data)
+        onNodeClick?.(d.data)
       })
       .on("mouseover", function (_, d: any) {
         onHover?.(d.data)
