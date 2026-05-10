@@ -70,8 +70,6 @@ export const Sunburst: React.FC<SunburstProps> = ({ data, className }) => {
         // 【关键】初始状态：透明，且路径收缩
         .attr("opacity", 0)
         .attr('d', (d: any) => {
-          // 保持角度 x0, x1 不变，只改变半径 y0, y1 到视图外
-          // 这样扇区的形状（张角）不变，只是位置在外圈
           const height = d.y1 - d.y0; // 保持扇区厚度一致
           return arc({
             ...d,
@@ -86,6 +84,7 @@ export const Sunburst: React.FC<SunburstProps> = ({ data, className }) => {
 
       updateSelection
         .transition().duration(300)
+        .delay(d => d.depth * 100)
         .attr("opacity", NORMAL_OPACITY)
         .attr("d", arc); // D3 会自动对 path 的 d 属性进行插值过渡
 
